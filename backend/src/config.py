@@ -19,6 +19,6 @@ class Settings(BaseSettings):
     
     database_url: str = "sqlite:///./data/krepsys.db"
     port: int = 8080
-    allowed_origins: str = "http://localhost:3000,http://krepsys.local"
+    allowed_origins: str = "http://localhost:18300,http://krepsys.local"
     fetch_interval: int = 900  # seconds (15 minutes)
     log_level: str = "INFO"
