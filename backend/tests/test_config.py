@@ -47,7 +47,7 @@ def test_settings_has_sensible_defaults():
     # Verify default values
     assert settings.database_url == "sqlite:///./data/krepsys.db"
     assert settings.port == 8080
-    assert settings.allowed_origins == "http://localhost:3000,http://krepsys.local"
+    assert settings.allowed_origins == "http://localhost:18300,http://krepsys.local"
     assert settings.fetch_interval == 900
     assert settings.log_level == "INFO"
     
