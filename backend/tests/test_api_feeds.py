@@ -102,6 +102,12 @@ def test_get_feed_by_id(client):
     assert data["url"] == feed_data["url"]
 
 
+def test_get_feed_not_found(client):
+    """Test GET /api/feeds/{id} returns 404 for non-existent feed."""
+    response = client.get("/api/feeds/999")
+    assert response.status_code == 404
+
+
 def test_update_feed(client):
     """Test PATCH /api/feeds/{id} updates a feed."""
     # Create a feed
