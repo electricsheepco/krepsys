@@ -16,6 +16,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.config import Settings
 from src.database import engine, Base
+from src.api.feeds import router as feeds_router
 
 # Initialize settings
 settings = Settings()
@@ -81,6 +82,9 @@ app.add_middleware(
 )
 
 logger.info(f"CORS configured for origins: {origins}")
+
+# Include API routers
+app.include_router(feeds_router)
 
 
 @app.get("/health")
