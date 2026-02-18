@@ -1,44 +1,6 @@
 """Tests for feed API endpoints."""
 
-import pytest
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from src.main import app
-from src.database import Base, get_db
-from src.models.feed import Feed
-
-
-# Create test database
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test_api_feeds.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def override_get_db():
-    """Override database dependency for testing."""
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_database():
-    """Create tables before each test and drop after."""
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
-
-
-@pytest.fixture
-def client():
-    """Create test client."""
-    return TestClient(app)
+# Fixtures are provided by conftest.py
 
 
 def test_list_feeds_empty(client):

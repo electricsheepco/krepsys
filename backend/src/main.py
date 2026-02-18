@@ -17,6 +17,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.config import Settings
 from src.database import engine, Base
 from src.api.feeds import router as feeds_router
+from src.api.articles import router as articles_router
+# Import models to register them with SQLAlchemy Base
+from src.models import Feed, Article  # noqa: F401
 
 # Initialize settings
 settings = Settings()
@@ -85,6 +88,7 @@ logger.info(f"CORS configured for origins: {origins}")
 
 # Include API routers
 app.include_router(feeds_router)
+app.include_router(articles_router)
 
 
 @app.get("/health")

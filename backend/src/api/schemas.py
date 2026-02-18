@@ -35,3 +35,30 @@ class FeedResponse(FeedBase):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ArticleResponse(BaseModel):
+    """Schema for article response (includes database fields)."""
+
+    id: int
+    feed_id: int
+    title: str
+    url: str
+    author: Optional[str] = None
+    content: Optional[str] = None
+    content_text: Optional[str] = None
+    published_at: Optional[datetime] = None
+    fetched_at: datetime
+    is_read: bool
+    is_saved: bool
+    is_archived: bool
+
+    model_config = {"from_attributes": True}
+
+
+class ArticleUpdate(BaseModel):
+    """Schema for updating article status (all fields optional for partial updates)."""
+
+    is_read: Optional[bool] = None
+    is_saved: Optional[bool] = None
+    is_archived: Optional[bool] = None
