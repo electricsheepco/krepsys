@@ -23,3 +23,50 @@ export function useCreateFeed() {
     },
   });
 }
+
+export function useDeleteFeed() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (feedId) => {
+      await apiClient.delete(`/api/feeds/${feedId}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['feeds'] });
+      queryClient.invalidateQueries({ queryKey: ['articles'] });
+    },
+  });
+}
+
+export function useAllTags() {
+  return useQuery({
+    queryKey: ['tags'],
+    queryFn: async () => {
+      const { data } = await apiClient.get('/api/articles/tags/all');
+      return data;
+    },
+  });
+}
+
+export function useArticleTags(articleId) {
+  const queryClient = useQueryClient();
+  const add = useMutation({
+    mutationFn: async (name) => {
+      const { data } = await apiClient.post(`/api/articles/${articleId}/tags`, { name });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['article', articleId] });
+      queryClient.invalidateQueries({ queryKey: ['tags'] });
+    },
+  });
+  const remove = useMutation({
+    mutationFn: async (name) => {
+      const { data } = await apiClient.delete(`/api/articles/${articleId}/tags/${name}`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['article', articleId] });
+    },
+  });
+  return { add, remove };
+}

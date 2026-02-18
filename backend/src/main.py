@@ -14,12 +14,15 @@ import json
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 from src.config import Settings
 from src.database import engine, Base
 from src.api.feeds import router as feeds_router
 from src.api.articles import router as articles_router
+from src.api.tags import router as tags_router
+from src.api.highlights import router as highlights_router
 # Import models to register them with SQLAlchemy Base
-from src.models import Feed, Article  # noqa: F401
+from src.models import Feed, Article, Tag, Highlight  # noqa: F401
 
 # Initialize settings
 settings = Settings()
@@ -56,9 +59,21 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Krepsys application")
     
-    # Create database tables
+    # Create new tables (additive — won't touch existing tables)
     Base.metadata.create_all(bind=engine)
     logger.info("Database tables created")
+
+    # Runtime migration: add columns that may not exist in older DBs
+    with engine.connect() as conn:
+        for stmt in [
+            "ALTER TABLE articles ADD COLUMN note TEXT",
+        ]:
+            try:
+                conn.execute(text(stmt))
+                conn.commit()
+                logger.info(f"Migration applied: {stmt}")
+            except Exception:
+                pass  # Column already exists
     
     yield
     
@@ -89,6 +104,8 @@ logger.info(f"CORS configured for origins: {origins}")
 # Include API routers
 app.include_router(feeds_router)
 app.include_router(articles_router)
+app.include_router(tags_router)
+app.include_router(highlights_router)
 
 
 @app.get("/health")

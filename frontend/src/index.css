@@ -1,2 +1,84 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+@import url('https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap');
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+/* ── Keyframes ─────────────────────────────── */
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.22s ease forwards;
+  opacity: 0;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease forwards;
+}
+
+/* ── Sidebar nav items ─────────────────────── */
+
+.sidebar-item {
+  transition: background 0.13s ease, color 0.13s ease;
+  color: #a89278;   /* warm tan — clearly visible on dark sepia */
+  font-weight: 500;
+}
+.sidebar-item:hover {
+  background: rgba(220, 185, 140, 0.1);
+  color: #d4c0a4;
+}
+.sidebar-item.active {
+  background: rgba(220, 185, 140, 0.15);
+  color: #f0e4cc;
+}
+
+/* ── Article list items ────────────────────── */
+
+.article-row {
+  transition: background 0.12s ease;
+}
+.article-row:hover {
+  background: #ede4d4;
+}
+.article-row.selected {
+  background: #e4dbc8;
+}
+
+/* ── Shimmer skeleton ──────────────────────── */
+
+.shimmer {
+  background: linear-gradient(90deg, #e8e0d0 25%, #d8d0c0 50%, #e8e0d0 75%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+/* ── Scrollbar ─────────────────────────────── */
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 70, 30, 0.2);
+  border-radius: 2px;
+}

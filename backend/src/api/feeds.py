@@ -2,11 +2,12 @@
 
 import logging
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from src.database import get_db
 from src.models.feed import Feed
 from src.api.schemas import FeedCreate, FeedUpdate, FeedResponse
+from src.utils.fetcher import fetch_feed
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def list_feeds(db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=FeedResponse, status_code=status.HTTP_201_CREATED)
-def create_feed(feed: FeedCreate, db: Session = Depends(get_db)):
+def create_feed(feed: FeedCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """Create a new feed.
     
     Args:
@@ -60,7 +61,8 @@ def create_feed(feed: FeedCreate, db: Session = Depends(get_db)):
     db.refresh(db_feed)
     
     logger.info(f"Created feed: id={db_feed.id}, name='{db_feed.name}', url='{db_feed.url}'")
-    
+    background_tasks.add_task(fetch_feed, db_feed.id, db_feed.url, db)
+
     return db_feed
 
 
@@ -85,6 +87,16 @@ def get_feed(feed_id: int, db: Session = Depends(get_db)):
             detail=f"Feed with id {feed_id} not found"
         )
     return feed
+
+
+@router.post("/{feed_id}/refresh", status_code=status.HTTP_200_OK)
+def refresh_feed(feed_id: int, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    """Trigger a manual fetch for a feed."""
+    feed = db.query(Feed).filter(Feed.id == feed_id).first()
+    if not feed:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Feed {feed_id} not found")
+    background_tasks.add_task(fetch_feed, feed.id, feed.url, db)
+    return {"status": "fetch scheduled"}
 
 
 @router.patch("/{feed_id}", response_model=FeedResponse)

@@ -1,77 +1,115 @@
+import { Bookmark } from 'lucide-react';
 import { useArticles } from '../hooks/useArticles';
+
+const C = {
+  bg:       '#f5efe4',
+  border:   '#ddd4c0',
+  header:   '#2a1e10',
+  badge:    '#c8b898',
+  badgeBg:  '#e8dfc8',
+  unread:   '#1e1408',   /* strong dark brown for unread */
+  read:     '#8a7860',
+  date:     '#9a8870',
+  dot:      '#c8762a',
+  selected: '#e4d8c0',
+};
+
+function formatDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffMins < 60) return `${diffMins}m`;
+  if (diffHours < 24) return `${diffHours}h`;
+  if (diffDays < 7) return `${diffDays}d`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
 
 export default function ArticleList({ filters, selectedArticle, onSelectArticle }) {
   const { data: articles, isLoading, error } = useArticles(filters);
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
-  };
-
   return (
-    <div className="w-96 bg-white border-r border-gray-200 flex flex-col h-screen">
+    <div
+      className="w-80 flex flex-col h-screen flex-shrink-0"
+      style={{ background: C.bg, borderRight: `1px solid ${C.border}` }}
+    >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">Articles</h2>
+      <div
+        className="px-4 py-[13px] flex items-center justify-between flex-shrink-0"
+        style={{ borderBottom: `1px solid ${C.border}` }}
+      >
+        <h2 className="text-[14px] font-bold" style={{ color: C.header }}>
+          Articles
+        </h2>
         {articles && (
-          <p className="text-sm text-gray-500 mt-1">{articles.length} articles</p>
+          <span
+            className="text-[11px] font-semibold px-2 py-0.5 rounded-md"
+            style={{ background: C.badgeBg, color: C.badge }}
+          >
+            {articles.length}
+          </span>
         )}
       </div>
 
-      {/* Article List */}
+      {/* List */}
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
-          <div className="p-4">
-            <div className="animate-pulse space-y-4">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="p-4 border-b">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
+          <div className="p-3 space-y-2">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="p-3 rounded-xl" style={{ background: C.badgeBg }}>
+                <div className="shimmer h-4 rounded-md w-3/4 mb-2" />
+                <div className="shimmer h-3 rounded-md w-1/4" />
+              </div>
+            ))}
           </div>
         ) : error ? (
-          <div className="p-4 text-red-600">
-            Error loading articles: {error.message}
+          <div className="p-4 text-[13px] font-medium" style={{ color: '#c04030' }}>
+            Error: {error.message}
           </div>
         ) : articles?.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">
-            <p>No articles found</p>
+          <div className="p-6 text-center">
+            <p className="text-[13px] font-medium" style={{ color: C.read }}>No articles found</p>
           </div>
         ) : (
-          <div>
-            {articles?.map(article => (
+          <div key={JSON.stringify(filters)}>
+            {articles?.map((article, i) => (
               <button
                 key={article.id}
                 onClick={() => onSelectArticle(article.id)}
-                className={`w-full text-left p-4 border-b border-gray-100 hover:bg-gray-50 ${
-                  selectedArticle === article.id ? 'bg-blue-50' : ''
-                } ${!article.is_read ? 'font-medium' : ''}`}
+                className={`article-row w-full text-left px-4 py-4 animate-fade-slide-up ${
+                  selectedArticle === article.id ? 'selected' : ''
+                }`}
+                style={{
+                  borderBottom: `1px solid ${C.border}`,
+                  animationDelay: `${Math.min(i * 0.03, 0.3)}s`,
+                }}
               >
-                <div className="flex items-start justify-between">
-                  <h3 className={`text-sm ${!article.is_read ? 'text-gray-900' : 'text-gray-600'}`}>
+                <div className="flex items-start justify-between gap-2">
+                  <p
+                    className="text-[13px] leading-snug flex-1"
+                    style={{
+                      color: article.is_read ? C.read : C.unread,
+                      fontWeight: article.is_read ? 400 : 600,
+                    }}
+                  >
                     {article.title}
-                  </h3>
+                  </p>
                   {!article.is_read && (
-                    <span className="ml-2 w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></span>
+                    <div
+                      className="w-2 h-2 rounded-full flex-shrink-0 mt-1"
+                      style={{ background: C.dot }}
+                    />
                   )}
                 </div>
-                <div className="flex items-center gap-2 mt-1">
-                  <p className="text-xs text-gray-500">
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="text-[11px] font-medium" style={{ color: C.date }}>
                     {formatDate(article.published_at || article.fetched_at)}
-                  </p>
+                  </span>
                   {article.is_saved && (
-                    <span className="text-xs text-blue-600">★</span>
+                    <Bookmark size={11} style={{ color: C.dot }} fill={C.dot} />
                   )}
                 </div>
               </button>
