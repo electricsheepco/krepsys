@@ -7,10 +7,6 @@ pydantic-settings==2.5.0
 # Database
 sqlalchemy==2.0.36
 
-# Task Queue
-celery==5.3.6
-redis==5.0.1
-
 # HTTP Client
 requests==2.32.0
 
@@ -23,4 +19,3 @@ black==24.8.0
 ruff==0.6.0
 mypy==1.11.0
 pytest-cov==5.0.0
-pydantic-settings>=2.0.0
