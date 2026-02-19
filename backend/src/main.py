@@ -9,6 +9,7 @@ Follows 12-factor app principles:
 - Auto-generated API documentation
 """
 
+import asyncio
 import logging
 import json
 from contextlib import asynccontextmanager
@@ -23,6 +24,7 @@ from src.api.tags import router as tags_router
 from src.api.highlights import router as highlights_router
 # Import models to register them with SQLAlchemy Base
 from src.models import Feed, Article, Tag, Highlight  # noqa: F401
+from src.utils.scheduler import run_scheduler
 
 # Initialize settings
 settings = Settings()
@@ -75,9 +77,18 @@ async def lifespan(app: FastAPI):
             except Exception:
                 pass  # Column already exists
     
+    # Start background feed scheduler
+    scheduler_task = asyncio.create_task(run_scheduler())
+    logger.info("Background scheduler started")
+
     yield
-    
+
     # Shutdown
+    scheduler_task.cancel()
+    try:
+        await scheduler_task
+    except asyncio.CancelledError:
+        pass
     logger.info("Shutting down Krepsys application")
 
 
