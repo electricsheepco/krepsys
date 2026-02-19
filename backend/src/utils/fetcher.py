@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import feedparser
 from sqlalchemy.orm import Session
 from src.models.article import Article
+from src.models.feed import Feed
 
 logger = logging.getLogger(__name__)
 
@@ -61,5 +62,10 @@ def fetch_feed(feed_id: int, feed_url: str, db: Session) -> int:
     if new_count:
         db.commit()
         logger.info(f"Feed {feed_url}: added {new_count} new articles")
+
+    feed_obj = db.query(Feed).filter(Feed.id == feed_id).first()
+    if feed_obj:
+        feed_obj.last_fetched = datetime.now(timezone.utc)
+        db.commit()
 
     return new_count
