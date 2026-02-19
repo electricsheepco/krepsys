@@ -42,7 +42,7 @@ async def run_scheduler() -> None:
             db = SessionLocal()
             try:
                 due = [
-                    f for f in db.query(Feed).filter(Feed.is_active.is_(True)).all()
+                    (f.id, f.url) for f in db.query(Feed).filter(Feed.is_active.is_(True)).all()
                     if _is_feed_due(f)
                 ]
             finally:
@@ -50,9 +50,9 @@ async def run_scheduler() -> None:
 
             if due:
                 logger.info("Scheduler: %d feed(s) due for refresh", len(due))
-            for feed in due:
+            for feed_id, feed_url in due:
                 await loop.run_in_executor(
-                    None, _fetch_feed_with_session, feed.id, feed.url
+                    None, _fetch_feed_with_session, feed_id, feed_url
                 )
         except asyncio.CancelledError:
             logger.info("Scheduler shutting down")
