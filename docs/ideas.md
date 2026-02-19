@@ -2,7 +2,7 @@
 
 ## High Priority
 - [ ] Add feed via URL (UI form in Sidebar)
-- [ ] RSS fetching worker (background sync on interval)
+- [x] RSS fetching worker (background sync on interval)
 - [ ] Kill the Newsletter integration (email-to-RSS)
 - [ ] Docker Compose setup for one-command deploy
 
