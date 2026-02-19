@@ -35,14 +35,14 @@ def _fetch_feed_with_session(feed_id: int, feed_url: str) -> int:
 async def run_scheduler() -> None:
     """Background task: checks and fetches due feeds every TICK_INTERVAL seconds."""
     logger.info("Scheduler started (tick interval: %ds)", TICK_INTERVAL)
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     while True:
         try:
             await asyncio.sleep(TICK_INTERVAL)
             db = SessionLocal()
             try:
                 due = [
-                    f for f in db.query(Feed).filter(Feed.is_active == True).all()
+                    f for f in db.query(Feed).filter(Feed.is_active.is_(True)).all()
                     if _is_feed_due(f)
                 ]
             finally:

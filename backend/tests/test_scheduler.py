@@ -37,6 +37,6 @@ def test_is_feed_due_exactly_at_interval():
 
 def test_is_feed_due_naive_datetime():
     # DB may return naive datetime — should still work
-    naive = datetime.utcnow() - timedelta(seconds=1800)
+    naive = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(seconds=1800)
     feed = _make_feed(last_fetched=naive, fetch_interval=900)
     assert _is_feed_due(feed) is True
