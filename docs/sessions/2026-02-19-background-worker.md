@@ -18,3 +18,10 @@
 - [ ] Keyboard shortcuts: j/k navigate, r=read, s=save
 - [ ] OPML import
 - [ ] Full-text search
+
+---
+
+## Also This Session
+
+- [x] GitHub repo created — https://github.com/electricsheepco/krepsys (public)
+- [x] Docker Compose designed — `docs/plans/2026-02-19-docker-compose.md` (ready to execute next session)
